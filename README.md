@@ -141,6 +141,15 @@ NAME                                       DESIRED   CURRENT   READY   AGE
 replicaset.apps/istio-ingress-558bf5d956   1         0         0       25m
 replicaset.apps/istiod-c58746c74           1         1         1       158m
 
+
+dell@dell-Latitude-3420:~/Desktop$ token=$(curl -s https://authority.cb-interview.com/token --resolve authority.cb-interview.com:443:127.0.0.1)
+
+dell@dell-Latitude-3420:~/Desktop$ curl https://servicex.cb-interview.com/x --resolve servicex.cb-interview.com:443:127.0.0.1 --header "Authorization: Bearer $token"
+curl: (7) Failed to connect to servicex.cb-interview.com port 443 after 0 ms: Connection refused
+dell@dell-Latitude-3420:~/Desktop$ 
+
+
+
 NAME                                         REFERENCE           TARGETS              MINPODS   MAXPODS   REPLICAS   AGE
 horizontalpodautoscaler.autoscaling/istiod   Deployment/istiod   cpu: <unknown>/80%   1         5         1          158m
 dell@dell-Latitude-3420:~/Desktop$ 
