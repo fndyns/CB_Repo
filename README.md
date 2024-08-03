@@ -148,9 +148,135 @@ dell@dell-Latitude-3420:~/Desktop$ curl https://servicex.cb-interview.com/x --re
 curl: (7) Failed to connect to servicex.cb-interview.com port 443 after 0 ms: Connection refused
 dell@dell-Latitude-3420:~/Desktop$ 
 
+# Although I have worked hard to solve authentication issue. I couldnt solve it. I tried to make the same cert usage for istio ingress and istiod by copying the cert from one to another, it didnt solve the issue. I also tried to have tokens within istio ingress pod just as in istiod pod, it also didnt solve issue. Here is the current status of the issue ;
+
+
+
 
 
 NAME                                         REFERENCE           TARGETS              MINPODS   MAXPODS   REPLICAS   AGE
 horizontalpodautoscaler.autoscaling/istiod   Deployment/istiod   cpu: <unknown>/80%   1         5         1          158m
 dell@dell-Latitude-3420:~/Desktop$ 
+
+dell@dell-Latitude-3420:~/Desktop/CBRepo/CB_Repo/KubernetesTest-main/apps$ 
+dell@dell-Latitude-3420:~/Desktop/CBRepo/CB_Repo/KubernetesTest-main/apps$ kubectl exec -it istio-ingress-85bb545b6c-v4bf6 -n istio-system -- ls /var/run/secrets/tokens
+kubectl exec -it istio-ingress-85bb545b6c-v4bf6 -n istio-system -- cat /var/run/secrets/tokens/istio-token
+kubectl exec -it istio-ingress-85bb545b6c-v4bf6 -n istio-system -- ls -l /var/run/secrets/tokens/istio-token
+ls: cannot access '/var/run/secrets/tokens': No such file or directory
+command terminated with exit code 2
+cat: /var/run/secrets/tokens/istio-token: No such file or directory
+command terminated with exit code 1
+ls: cannot access '/var/run/secrets/tokens/istio-token': No such file or directory
+command terminated with exit code 2
+dell@dell-Latitude-3420:~/Desktop/CBRepo/CB_Repo/KubernetesTest-main/apps$ kubectl exec -it istio-ingress-85bb545b6c-v4bf6 -n istio-system -- sh
+# 
+# cd /var/run/secrets/tokens
+sh: 2: cd: can't cd to /var/run/secrets/tokens
+# cd var
+# cd run/secrets/tokens
+sh: 4: cd: can't cd to run/secrets/tokens
+# cd run/              
+# ls
+lock  mount  secrets  systemd
+# cd secrets	
+# ls
+istio  kubernetes.io  workload-spiffe-uds
+# cd tokens
+sh: 9: cd: can't cd to tokens
+# cat tokens
+cat: tokens: No such file or directory
+# ls
+istio  kubernetes.io  workload-spiffe-uds
+# pwd
+/var/run/secrets
+# cd istio
+# ls
+root-cert.pem
+# exit
+dell@dell-Latitude-3420:~/Desktop/CBRepo/CB_Repo/KubernetesTest-main/apps$ 
+dell@dell-Latitude-3420:~/Desktop/CBRepo/CB_Repo/KubernetesTest-main/apps$ kubectl get serviceaccount istio-ingress -n istio-system -o yaml
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  annotations:
+    kubectl.kubernetes.io/last-applied-configuration: |
+      {"apiVersion":"v1","kind":"ServiceAccount","metadata":{"annotations":{"meta.helm.sh/release-name":"istio-ingress","meta.helm.sh/release-namespace":"istio-system"},"labels":{"app":"istio-ingress","app.kubernetes.io/managed-by":"Helm","app.kubernetes.io/name":"istio-ingress","app.kubernetes.io/version":"1.20.0","helm.sh/chart":"gateway-1.20.0","helm.toolkit.fluxcd.io/name":"istio-ingress","helm.toolkit.fluxcd.io/namespace":"istio-system","istio":"ingress"},"name":"istio-ingress","namespace":"istio-system"}}
+    meta.helm.sh/release-name: istio-ingress
+    meta.helm.sh/release-namespace: istio-system
+  creationTimestamp: "2024-08-02T14:10:40Z"
+  labels:
+    app: istio-ingress
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: istio-ingress
+    app.kubernetes.io/version: 1.20.0
+    helm.sh/chart: gateway-1.20.0
+    helm.toolkit.fluxcd.io/name: istio-ingress
+    helm.toolkit.fluxcd.io/namespace: istio-system
+    istio: ingress
+  name: istio-ingress
+  namespace: istio-system
+  resourceVersion: "41209"
+  uid: 50535c5c-513d-43e1-a6b1-9de405cfa5f8
+dell@dell-Latitude-3420:~/Desktop/CBRepo/CB_Repo/KubernetesTest-main/apps$ vim sa-patch.yaml
+dell@dell-Latitude-3420:~/Desktop/CBRepo/CB_Repo/KubernetesTest-main/apps$ kubectl patch serviceaccount istio-ingress -n istio-system --patch "$(cat sa-patch.yaml)"
+serviceaccount/istio-ingress patched
+dell@dell-Latitude-3420:~/Desktop/CBRepo/CB_Repo/KubernetesTest-main/apps$ vim deployment-patch.yaml
+dell@dell-Latitude-3420:~/Desktop/CBRepo/CB_Repo/KubernetesTest-main/apps$ kubectl patch deployment istio-ingress -n istio-system --patch "$(cat deployment-patch.yaml)"
+deployment.apps/istio-ingress patched
+dell@dell-Latitude-3420:~/Desktop/CBRepo/CB_Repo/KubernetesTest-main/apps$ kubectl rollout restart deployment istio-ingress -n istio-system
+deployment.apps/istio-ingress restarted
+dell@dell-Latitude-3420:~/Desktop/CBRepo/CB_Repo/KubernetesTest-main/apps$ kubectl exec -it istio-ingress-85bb545b6c-v4bf6 -n istio-system -- sh
+Error from server (NotFound): pods "istio-ingress-85bb545b6c-v4bf6" not found
+dell@dell-Latitude-3420:~/Desktop/CBRepo/CB_Repo/KubernetesTest-main/apps$ kubectl get pods -n istio-system -l app=istio-ingress
+NAME                             READY   STATUS    RESTARTS   AGE
+istio-ingress-77d568d77b-vs5pb   0/1     Running   0          26s
+istio-ingress-784b969d75-c7g6h   0/1     Running   0          32s
+dell@dell-Latitude-3420:~/Desktop/CBRepo/CB_Repo/KubernetesTest-main/apps$ kubectl exec -it istio-ingress-77d568d77b-vs5pb -n istio-system -- sh
+# cd var
+# cd run
+# ls
+lock  mount  secrets  systemd
+# cd secrets	
+# ls
+istio  kubernetes.io  tokens  workload-spiffe-uds
+# cd tokens
+# ls -ltr
+total 0
+lrwxrwxrwx 1 root root 18 Aug  3 12:59 istio-token -> ..data/istio-token
+# ls
+istio-token
+# cat istio-token
+eyJhbGciOiJSUzI1NiIsImtpZCI6IkZJdnhrVUdaNWlkaXdSVkhfM3FkNGprcTRGM3pROVExV2kyY0NPaEJFeDgifQ.eyJhdWQiOlsiaXN0aW8tY2EiXSwiZXhwIjoxNzIyNjkzNTU5LCJpYXQiOjE3MjI2ODk5NTksImlzcyI6Imh0dHBzOi8va3ViZXJuZXRlcy5kZWZhdWx0LnN2Yy5jbHVzdGVyLmxvY2FsIiwianRpIjoiYjE1Yzc4ODEtYjM4Yi00ODU2LTgzZTItMTA5MmRlZTVhYjRlIiwia3ViZXJuZXRlcy5pbyI6eyJuYW1lc3BhY2UiOiJpc3Rpby1zeXN0ZW0iLCJub2RlIjp7Im5hbWUiOiJtaW5pa3ViZSIsInVpZCI6IjI2Y2QzM2IwLTA0ZDktNDc2NS04NzhjLTdmYTU3ZmFiNTM5MyJ9LCJwb2QiOnsibmFtZSI6ImlzdGlvLWluZ3Jlc3MtNzdkNTY4ZDc3Yi12czVwYiIsInVpZCI6ImY0ZTE0ZmM5LTEyMDktNDgxNS1iOWRmLWI1MjRkZDQ3MDQ1OCJ9LCJzZXJ2aWNlYWNjb3VudCI6eyJuYW1lIjoiaXN0aW8taW5ncmVzcyIsInVpZCI6IjUwNTM1YzVjLTUxM2QtNDNlMS1hNmIxLTlkZTQwNWNmYTVmOCJ9fSwibmJmIjoxNzIyNjg5OTU5LCJzdWIiOiJzeXN0ZW06c2VydmljZWFjY291bnQ6aXN0aW8tc3lzdGVtOmlzdGlvLWluZ3Jlc3MifQ.U_I5d_CJRomnhFz-_7k5hpCQp0vNr0PJTuebZnaC-IFQexnQGMw461-vP_Eslw8RbGrNm7cnHkllODr2TTDXXpUuI2CrlBvxIrFO_wTlgNFryHxLs7A_bf6eqeenErZxOGLYEjN-XOeT-UoHwN-q2M8OIz74KFZRl4oqzvXusk7E2sGfNqbHm-onLlwqVsg42sEjIYstQ8OrWAmZw92nIBEqq7k9MJJSICPYGGLhHh83qtkptf_nkk7LHLsskWLRITBaZnsBrey3_KODpq8Zyrh61lrdcXzSDP1KMVsj8feERBjrp6aKGULtQjhVsT1l9dCjxoCJH3oH-Fr8lz97tw# exit
+dell@dell-Latitude-3420:~/Desktop/CBRepo/CB_Repo/KubernetesTest-main/apps$ kubectl get pods -n istio-system -l app=istio-ingress
+NAME                             READY   STATUS    RESTARTS   AGE
+istio-ingress-77d568d77b-vs5pb   0/1     Running   0          113s
+istio-ingress-784b969d75-c7g6h   0/1     Running   0          119s
+dell@dell-Latitude-3420:~/Desktop/CBRepo/CB_Repo/KubernetesTest-main/apps$ kubectl logs -l app=istio-ingress -n istio-system
+2024-08-03T13:00:26.753468Z	warning	envoy config external/envoy/source/extensions/config_subscription/grpc/grpc_stream.h:152	StreamAggregatedResources gRPC config stream to xds-grpc closed: 7, authorization failed: no identities ([spiffe://cluster.local/ns/istio-system/sa/istio-ingress]) matched $(POD_NAMESPACE)/	thread=20
+2024-08-03T13:00:48.385533Z	info	xdsproxy	connected to upstream XDS server: istiod.istio-system.svc:15012
+2024-08-03T13:00:48.387247Z	warn	xdsproxy	upstream [11] terminated with unexpected error rpc error: code = PermissionDenied desc = authorization failed: no identities ([spiffe://cluster.local/ns/istio-system/sa/istio-ingress]) matched $(POD_NAMESPACE)/
+2024-08-03T13:00:48.387448Z	warning	envoy config external/envoy/source/extensions/config_subscription/grpc/grpc_stream.h:152	StreamAggregatedResources gRPC config stream to xds-grpc closed: 7, authorization failed: no identities ([spiffe://cluster.local/ns/istio-system/sa/istio-ingress]) matched $(POD_NAMESPACE)/	thread=20
+2024-08-03T13:00:57.858103Z	info	xdsproxy	connected to upstream XDS server: istiod.istio-system.svc:15012
+2024-08-03T13:00:57.859958Z	warn	xdsproxy	upstream [12] terminated with unexpected error rpc error: code = PermissionDenied desc = authorization failed: no identities ([spiffe://cluster.local/ns/istio-system/sa/istio-ingress]) matched $(POD_NAMESPACE)/
+2024-08-03T13:00:57.860154Z	warning	envoy config external/envoy/source/extensions/config_subscription/grpc/grpc_stream.h:152	StreamAggregatedResources gRPC config stream to xds-grpc closed: 7, authorization failed: no identities ([spiffe://cluster.local/ns/istio-system/sa/istio-ingress]) matched $(POD_NAMESPACE)/	thread=20
+2024-08-03T13:01:20.859760Z	info	xdsproxy	connected to upstream XDS server: istiod.istio-system.svc:15012
+2024-08-03T13:01:20.861829Z	warn	xdsproxy	upstream [13] terminated with unexpected error rpc error: code = PermissionDenied desc = authorization failed: no identities ([spiffe://cluster.local/ns/istio-system/sa/istio-ingress]) matched $(POD_NAMESPACE)/
+2024-08-03T13:01:20.862054Z	warning	envoy config external/envoy/source/extensions/config_subscription/grpc/grpc_stream.h:152	StreamAggregatedResources gRPC config stream to xds-grpc closed: 7, authorization failed: no identities ([spiffe://cluster.local/ns/istio-system/sa/istio-ingress]) matched $(POD_NAMESPACE)/	thread=20
+2024-08-03T13:00:42.268537Z	warning	envoy config external/envoy/source/extensions/config_subscription/grpc/grpc_stream.h:152	StreamAggregatedResources gRPC config stream to xds-grpc closed: 7, authorization failed: no identities ([spiffe://cluster.local/ns/istio-system/sa/istio-ingress]) matched $(POD_NAMESPACE)/	thread=20
+2024-08-03T13:00:43.994250Z	info	xdsproxy	connected to upstream XDS server: istiod.istio-system.svc:15012
+2024-08-03T13:00:43.995996Z	warn	xdsproxy	upstream [14] terminated with unexpected error rpc error: code = PermissionDenied desc = authorization failed: no identities ([spiffe://cluster.local/ns/istio-system/sa/istio-ingress]) matched $(POD_NAMESPACE)/
+2024-08-03T13:00:43.996194Z	warning	envoy config external/envoy/source/extensions/config_subscription/grpc/grpc_stream.h:152	StreamAggregatedResources gRPC config stream to xds-grpc closed: 7, authorization failed: no identities ([spiffe://cluster.local/ns/istio-system/sa/istio-ingress]) matched $(POD_NAMESPACE)/	thread=20
+2024-08-03T13:00:56.459211Z	info	xdsproxy	connected to upstream XDS server: istiod.istio-system.svc:15012
+2024-08-03T13:00:56.460920Z	warn	xdsproxy	upstream [15] terminated with unexpected error rpc error: code = PermissionDenied desc = authorization failed: no identities ([spiffe://cluster.local/ns/istio-system/sa/istio-ingress]) matched $(POD_NAMESPACE)/
+2024-08-03T13:00:56.461137Z	warning	envoy config external/envoy/source/extensions/config_subscription/grpc/grpc_stream.h:152	StreamAggregatedResources gRPC config stream to xds-grpc closed: 7, authorization failed: no identities ([spiffe://cluster.local/ns/istio-system/sa/istio-ingress]) matched $(POD_NAMESPACE)/	thread=20
+2024-08-03T13:01:17.275987Z	info	xdsproxy	connected to upstream XDS server: istiod.istio-system.svc:15012
+2024-08-03T13:01:17.277751Z	warn	xdsproxy	upstream [16] terminated with unexpected error rpc error: code = PermissionDenied desc = authorization failed: no identities ([spiffe://cluster.local/ns/istio-system/sa/istio-ingress]) matched $(POD_NAMESPACE)/
+2024-08-03T13:01:17.277970Z	warning	envoy config external/envoy/source/extensions/config_subscription/grpc/grpc_stream.h:152	StreamAggregatedResources gRPC config stream to xds-grpc closed: 7, authorization failed: no identities ([spiffe://cluster.local/ns/istio-system/sa/istio-ingress]) matched $(POD_NAMESPACE)/	thread=20
+dell@dell-Latitude-3420:~/Desktop/CBRepo/CB_Repo/KubernetesTest-main/apps$ kubectl get pods -n istio-system -l app=istio-ingress
+NAME                             READY   STATUS    RESTARTS   AGE
+istio-ingress-77d568d77b-vs5pb   0/1     Running   0          2m10s
+istio-ingress-784b969d75-c7g6h   0/1     Running   0          2m16s
+dell@dell-Latitude-3420:~/Desktop/CBRepo/CB_Repo/KubernetesTest-main/apps$ 
+
+
 
