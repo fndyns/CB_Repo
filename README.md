@@ -278,5 +278,299 @@ istio-ingress-77d568d77b-vs5pb   0/1     Running   0          2m10s
 istio-ingress-784b969d75-c7g6h   0/1     Running   0          2m16s
 dell@dell-Latitude-3420:~/Desktop/CBRepo/CB_Repo/KubernetesTest-main/apps$ 
 
+dell@dell-Latitude-3420:~/Desktop/CBRepo/CB_Repo/KubernetesTest-main/apps$ kubectl describe pod -n istio-system
+Name:             istio-ingress-77d568d77b-vs5pb
+Namespace:        istio-system
+Priority:         0
+Service Account:  istio-ingress
+Node:             minikube/192.168.49.2
+Start Time:       Sat, 03 Aug 2024 15:59:19 +0300
+Labels:           app=istio-ingress
+                  istio=ingress
+                  pod-template-hash=77d568d77b
+Annotations:      kubectl.kubernetes.io/restartedAt: 2024-08-03T15:59:19+03:00
+Status:           Running
+IP:               10.244.0.51
+IPs:
+  IP:           10.244.0.51
+Controlled By:  ReplicaSet/istio-ingress-77d568d77b
+Containers:
+  istio-proxy:
+    Container ID:  docker://9956839f926d3b6586055ce4928b4738f008df0c3339ed81ea9673b0a6ed2735
+    Image:         docker.io/istio/proxyv2:1.20.0
+    Image ID:      docker-pullable://istio/proxyv2@sha256:19e8ca96e4f46733a3377fa962cb88cad13a35afddb9139ff795e36237327137
+    Ports:         15021/TCP, 80/TCP, 443/TCP, 15012/TCP, 15017/TCP
+    Host Ports:    0/TCP, 0/TCP, 0/TCP, 0/TCP, 0/TCP
+    Args:
+      proxy
+      router
+      --domain
+      $(POD_NAMESPACE).svc.cluster.local
+      --proxyLogLevel=warning
+      --proxyComponentLogLevel=misc:error
+      --log_output_level=default:info
+    State:          Running
+      Started:      Sat, 03 Aug 2024 15:59:19 +0300
+    Ready:          False
+    Restart Count:  0
+    Limits:
+      cpu:     2
+      memory:  1Gi
+    Requests:
+      cpu:        100m
+      memory:     128Mi
+    Readiness:    http-get http://:15021/healthz/ready delay=1s timeout=1s period=2s #success=1 #failure=3
+    Environment:  <none>
+    Mounts:
+      /var/run/secrets/istio from istiod-ca-cert (ro)
+      /var/run/secrets/kubernetes.io/serviceaccount from kube-api-access-g65sw (ro)
+      /var/run/secrets/tokens from istio-token (ro)
+Conditions:
+  Type                        Status
+  PodReadyToStartContainers   True 
+  Initialized                 True 
+  Ready                       False 
+  ContainersReady             False 
+  PodScheduled                True 
+Volumes:
+  istio-token:
+    Type:                    Projected (a volume that contains injected data from multiple sources)
+    TokenExpirationSeconds:  3600
+  istiod-ca-cert:
+    Type:        Secret (a volume populated by a Secret)
+    SecretName:  istio-ca-root-cert
+    Optional:    false
+  kube-api-access-g65sw:
+    Type:                    Projected (a volume that contains injected data from multiple sources)
+    TokenExpirationSeconds:  3607
+    ConfigMapName:           kube-root-ca.crt
+    ConfigMapOptional:       <nil>
+    DownwardAPI:             true
+QoS Class:                   Burstable
+Node-Selectors:              <none>
+Tolerations:                 node.kubernetes.io/not-ready:NoExecute op=Exists for 300s
+                             node.kubernetes.io/unreachable:NoExecute op=Exists for 300s
+Events:
+  Type     Reason     Age                      From     Message
+  ----     ------     ----                     ----     -------
+  Warning  Unhealthy  2m27s (x4467 over 147m)  kubelet  Readiness probe failed: Get "http://10.244.0.51:15021/healthz/ready": dial tcp 10.244.0.51:15021: connect: connection refused
+
+
+Name:             istio-ingress-784b969d75-c7g6h
+Namespace:        istio-system
+Priority:         0
+Service Account:  istio-ingress
+Node:             minikube/192.168.49.2
+Start Time:       Sat, 03 Aug 2024 15:59:13 +0300
+Labels:           app=istio-ingress
+                  istio=ingress
+                  pod-template-hash=784b969d75
+Annotations:      kubectl.kubernetes.io/restartedAt: 2024-08-03T15:42:18+03:00
+Status:           Running
+IP:               10.244.0.50
+IPs:
+  IP:           10.244.0.50
+Controlled By:  ReplicaSet/istio-ingress-784b969d75
+Containers:
+  istio-proxy:
+    Container ID:  docker://410a42280fdfc69d05ca66becbf4246738d7756db087438c92257c90788c4dd3
+    Image:         docker.io/istio/proxyv2:1.20.0
+    Image ID:      docker-pullable://istio/proxyv2@sha256:19e8ca96e4f46733a3377fa962cb88cad13a35afddb9139ff795e36237327137
+    Ports:         15021/TCP, 80/TCP, 443/TCP, 15012/TCP, 15017/TCP
+    Host Ports:    0/TCP, 0/TCP, 0/TCP, 0/TCP, 0/TCP
+    Args:
+      proxy
+      router
+      --domain
+      $(POD_NAMESPACE).svc.cluster.local
+      --proxyLogLevel=warning
+      --proxyComponentLogLevel=misc:error
+      --log_output_level=default:info
+    State:          Running
+      Started:      Sat, 03 Aug 2024 15:59:14 +0300
+    Ready:          False
+    Restart Count:  0
+    Limits:
+      cpu:     2
+      memory:  1Gi
+    Requests:
+      cpu:        100m
+      memory:     128Mi
+    Readiness:    http-get http://:15021/healthz/ready delay=1s timeout=1s period=2s #success=1 #failure=3
+    Environment:  <none>
+    Mounts:
+      /var/run/secrets/istio from istiod-ca-cert (ro)
+      /var/run/secrets/kubernetes.io/serviceaccount from kube-api-access-dvv6z (ro)
+      /var/run/secrets/tokens from istio-token (ro)
+Conditions:
+  Type                        Status
+  PodReadyToStartContainers   True 
+  Initialized                 True 
+  Ready                       False 
+  ContainersReady             False 
+  PodScheduled                True 
+Volumes:
+  istio-token:
+    Type:                    Projected (a volume that contains injected data from multiple sources)
+    TokenExpirationSeconds:  3600
+  istiod-ca-cert:
+    Type:        Secret (a volume populated by a Secret)
+    SecretName:  istio-ca-root-cert
+    Optional:    false
+  kube-api-access-dvv6z:
+    Type:                    Projected (a volume that contains injected data from multiple sources)
+    TokenExpirationSeconds:  3607
+    ConfigMapName:           kube-root-ca.crt
+    ConfigMapOptional:       <nil>
+    DownwardAPI:             true
+QoS Class:                   Burstable
+Node-Selectors:              <none>
+Tolerations:                 node.kubernetes.io/not-ready:NoExecute op=Exists for 300s
+                             node.kubernetes.io/unreachable:NoExecute op=Exists for 300s
+Events:
+  Type     Reason     Age                      From     Message
+  ----     ------     ----                     ----     -------
+  Warning  Unhealthy  2m33s (x4468 over 147m)  kubelet  Readiness probe failed: Get "http://10.244.0.50:15021/healthz/ready": dial tcp 10.244.0.50:15021: connect: connection refused
+
+
+Name:             istiod-c58746c74-q8wtr
+Namespace:        istio-system
+Priority:         0
+Service Account:  istiod
+Node:             minikube/192.168.49.2
+Start Time:       Fri, 02 Aug 2024 12:10:07 +0300
+Labels:           app=istiod
+                  install.operator.istio.io/owning-resource=unknown
+                  istio=pilot
+                  istio.io/rev=default
+                  operator.istio.io/component=Pilot
+                  pod-template-hash=c58746c74
+                  sidecar.istio.io/inject=false
+Annotations:      ambient.istio.io/redirection: disabled
+                  prometheus.io/port: 15014
+                  prometheus.io/scrape: true
+                  sidecar.istio.io/inject: false
+Status:           Running
+IP:               10.244.0.45
+IPs:
+  IP:           10.244.0.45
+Controlled By:  ReplicaSet/istiod-c58746c74
+Containers:
+  discovery:
+    Container ID:  docker://ef811b73646b22c0f93988d41b97d7e72481da3c655e85742cdb5f474fa574d1
+    Image:         docker.io/istio/pilot:1.20.0
+    Image ID:      docker-pullable://istio/pilot@sha256:da619cc0915a27988ba8357916d84b4a137253a9df967e6521b14dc7100bb246
+    Ports:         8080/TCP, 15010/TCP, 15017/TCP
+    Host Ports:    0/TCP, 0/TCP, 0/TCP
+    Args:
+      discovery
+      --monitoringAddr=:15014
+      --log_output_level=default:info
+      --domain
+      cluster.local
+      --keepaliveMaxServerConnectionAge
+      30m
+    State:          Running
+      Started:      Sat, 03 Aug 2024 13:28:01 +0300
+    Last State:     Terminated
+      Reason:       Error
+      Exit Code:    255
+      Started:      Fri, 02 Aug 2024 18:05:49 +0300
+      Finished:     Sat, 03 Aug 2024 13:27:51 +0300
+    Ready:          True
+    Restart Count:  2
+    Requests:
+      cpu:      500m
+      memory:   2Gi
+    Readiness:  http-get http://:8080/ready delay=1s timeout=5s period=3s #success=1 #failure=3
+    Environment:
+      REVISION:               default
+      JWT_POLICY:             third-party-jwt
+      PILOT_CERT_PROVIDER:    istiod
+      POD_NAME:               istiod-c58746c74-q8wtr (v1:metadata.name)
+      POD_NAMESPACE:          istio-system (v1:metadata.namespace)
+      SERVICE_ACCOUNT:         (v1:spec.serviceAccountName)
+      KUBECONFIG:             /var/run/secrets/remote/config
+      PILOT_TRACE_SAMPLING:   1
+      PILOT_ENABLE_ANALYSIS:  false
+      CLUSTER_ID:             Kubernetes
+      GOMEMLIMIT:             node allocatable (limits.memory)
+      GOMAXPROCS:             node allocatable (limits.cpu)
+      PLATFORM:               
+    Mounts:
+      /etc/cacerts from cacerts (ro)
+      /var/run/secrets/istio-dns from local-certs (rw)
+      /var/run/secrets/istiod/ca from istio-csr-ca-configmap (ro)
+      /var/run/secrets/istiod/tls from istio-csr-dns-cert (ro)
+      /var/run/secrets/kubernetes.io/serviceaccount from kube-api-access-624b5 (ro)
+      /var/run/secrets/remote from istio-kubeconfig (ro)
+      /var/run/secrets/tokens from istio-token (ro)
+Conditions:
+  Type                        Status
+  PodReadyToStartContainers   True 
+  Initialized                 True 
+  Ready                       True 
+  ContainersReady             True 
+  PodScheduled                True 
+Volumes:
+  local-certs:
+    Type:       EmptyDir (a temporary directory that shares a pod's lifetime)
+    Medium:     Memory
+    SizeLimit:  <unset>
+  istio-token:
+    Type:                    Projected (a volume that contains injected data from multiple sources)
+    TokenExpirationSeconds:  43200
+  cacerts:
+    Type:        Secret (a volume populated by a Secret)
+    SecretName:  cacerts
+    Optional:    true
+  istio-kubeconfig:
+    Type:        Secret (a volume populated by a Secret)
+    SecretName:  istio-kubeconfig
+    Optional:    true
+  istio-csr-dns-cert:
+    Type:        Secret (a volume populated by a Secret)
+    SecretName:  istiod-tls
+    Optional:    true
+  istio-csr-ca-configmap:
+    Type:      ConfigMap (a volume populated by a ConfigMap)
+    Name:      istio-ca-root-cert
+    Optional:  true
+  kube-api-access-624b5:
+    Type:                    Projected (a volume that contains injected data from multiple sources)
+    TokenExpirationSeconds:  3607
+    ConfigMapName:           kube-root-ca.crt
+    ConfigMapOptional:       <nil>
+    DownwardAPI:             true
+QoS Class:                   Burstable
+Node-Selectors:              <none>
+Tolerations:                 node.kubernetes.io/not-ready:NoExecute op=Exists for 300s
+                             node.kubernetes.io/unreachable:NoExecute op=Exists for 300s
+Events:                      <none>
+
+
+# Here is latest status of curl output ;
+
+dell@dell-Latitude-3420:~/Desktop/CBRepo/CB_Repo/KubernetesTest-main/apps$ kubectl get gateway  -A
+NAMESPACE   NAME                AGE
+authority   authority-gateway   29h
+servicex    servicex-gateway    29h
+
+dell@dell-Latitude-3420:~/Desktop/CBRepo/CB_Repo/KubernetesTest-main/apps$ kubectl get VirtualService -A
+NAMESPACE   NAME        GATEWAYS                HOSTS                            AGE
+authority   authority   ["authority-gateway"]   ["authority.cb-interview.com"]   29h
+servicex    servicex    ["servicex-gateway"]    ["servicex.cb-interview.com"]    29h
+dell@dell-Latitude-3420:~/Desktop/CBRepo/CB_Repo/KubernetesTest-main/apps$ kubectl get svc -n istio-system 
+NAME            TYPE        CLUSTER-IP      EXTERNAL-IP   PORT(S)                                        AGE
+istio-ingress   ClusterIP   10.98.51.203    <none>        15021/TCP,80/TCP,443/TCP,15012/TCP,15017/TCP   25h
+istiod          ClusterIP   10.101.17.149   <none>        15010/TCP,15012/TCP,443/TCP,15014/TCP          30h
+
+dell@dell-Latitude-3420:~/Desktop/CBRepo/CB_Repo/KubernetesTest-main/apps$ token=$(curl -s https://authority.cb-interview.com/token --resolve authority.cb-interview.com:443:127.0.0.1)
+dell@dell-Latitude-3420:~/Desktop/CBRepo/CB_Repo/KubernetesTest-main/apps$ curl -v https://servicex.cb-interview.com/x --resolve servicex.cb-interview.com:443:10.98.51.203 --header "Authorization: Bearer $token"
+* Added servicex.cb-interview.com:443:10.98.51.203 to DNS cache
+* Hostname servicex.cb-interview.com was found in DNS cache
+*   Trying 10.98.51.203:443...
+
+
 
 
