@@ -775,7 +775,7 @@ curl: (7) Failed to connect to localhost port 80 after 0 ms: Connection refused
 dell@dell-Latitude-3420:/etc$ 
 
 
-
+# I actually checked all notes in "**General Requirements for All Applications:**" in your TaskSteps.md file but none of them solved curl issue. I can provide you any extra kubectl output or file output if needed anytime although curl issue persist.
 
 
 
