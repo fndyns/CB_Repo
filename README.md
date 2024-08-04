@@ -571,6 +571,161 @@ dell@dell-Latitude-3420:~/Desktop/CBRepo/CB_Repo/KubernetesTest-main/apps$ curl 
 * Hostname servicex.cb-interview.com was found in DNS cache
 *   Trying 10.98.51.203:443...
 
+# I solved istio-ingress pod issue by adding POD_NAMESPACE env into the deployment of istio-ingress ;
+
+        env:
+        - name: POD_NAMESPACE
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.namespace
+
+# Then pod went up ;
+
+dell@dell-Latitude-3420:~$ kubectl get  all -A
+NAMESPACE       NAME                                          READY   STATUS    RESTARTS      AGE
+authority       pod/authority-557d4b4d87-gvfrx                1/1     Running   3 (63m ago)   2d1h
+flux-system     pod/helm-controller-8555c97646-2lr58          1/1     Running   5 (62m ago)   2d3h
+flux-system     pod/kustomize-controller-d676b44b6-82vgw      1/1     Running   7 (62m ago)   2d3h
+flux-system     pod/notification-controller-d4748b487-l5q6n   1/1     Running   5 (62m ago)   2d3h
+flux-system     pod/source-controller-7454d84978-jd4f6        1/1     Running   5 (63m ago)   2d3h
+istio-ingress   pod/istio-ingress-7f5f6f58b8-xrxdc            1/1     Running   3 (63m ago)   2d
+istio-system    pod/istio-ingress-7dfb5db76f-tz7rg            1/1     Running   0             33m
+istio-system    pod/istiod-c58746c74-q8wtr                    1/1     Running   3 (63m ago)   2d3h
+kube-system     pod/coredns-7db6d8ff4d-mfxn8                  1/1     Running   3 (63m ago)   2d3h
+kube-system     pod/etcd-minikube                             1/1     Running   3 (63m ago)   2d3h
+kube-system     pod/kube-apiserver-minikube                   1/1     Running   3 (63m ago)   2d3h
+kube-system     pod/kube-controller-manager-minikube          1/1     Running   3 (63m ago)   2d3h
+kube-system     pod/kube-proxy-xdfjm                          1/1     Running   3 (63m ago)   2d3h
+kube-system     pod/kube-scheduler-minikube                   1/1     Running   3 (63m ago)   2d3h
+kube-system     pod/storage-provisioner                       1/1     Running   8 (62m ago)   2d3h
+servicex        pod/servicex-78784f85c-cq757                  1/1     Running   3 (63m ago)   2d1h
+servicey        pod/servicey-858997546f-bjws5                 1/1     Running   3 (63m ago)   2d1h
+
+NAMESPACE       NAME                              TYPE        CLUSTER-IP       EXTERNAL-IP   PORT(S)                                        AGE
+authority       service/authority                 ClusterIP   10.107.90.32     <none>        80/TCP                                         2d1h
+default         service/kubernetes                ClusterIP   10.96.0.1        <none>        443/TCP                                        2d3h
+flux-system     service/notification-controller   ClusterIP   10.110.29.37     <none>        80/TCP                                         2d3h
+flux-system     service/source-controller         ClusterIP   10.96.6.189      <none>        80/TCP                                         2d3h
+flux-system     service/webhook-receiver          ClusterIP   10.99.94.177     <none>        80/TCP                                         2d3h
+istio-ingress   service/istio-ingress             ClusterIP   10.110.111.235   <none>        15021/TCP,80/TCP,443/TCP,15012/TCP,15017/TCP   46h
+istio-system    service/istio-ingress             ClusterIP   10.98.51.203     <none>        15021/TCP,80/TCP,443/TCP,15012/TCP,15017/TCP   46h
+istio-system    service/istiod                    ClusterIP   10.101.17.149    <none>        15010/TCP,15012/TCP,443/TCP,15014/TCP          2d3h
+kube-system     service/kube-dns                  ClusterIP   10.96.0.10       <none>        53/UDP,53/TCP,9153/TCP                         2d3h
+servicex        service/servicex                  ClusterIP   10.111.215.193   <none>        80/TCP                                         2d1h
+
+NAMESPACE     NAME                        DESIRED   CURRENT   READY   UP-TO-DATE   AVAILABLE   NODE SELECTOR            AGE
+kube-system   daemonset.apps/kube-proxy   1         1         1       1            1           kubernetes.io/os=linux   2d3h
+
+NAMESPACE       NAME                                      READY   UP-TO-DATE   AVAILABLE   AGE
+authority       deployment.apps/authority                 1/1     1            1           2d1h
+flux-system     deployment.apps/helm-controller           1/1     1            1           2d3h
+flux-system     deployment.apps/kustomize-controller      1/1     1            1           2d3h
+flux-system     deployment.apps/notification-controller   1/1     1            1           2d3h
+flux-system     deployment.apps/source-controller         1/1     1            1           2d3h
+istio-ingress   deployment.apps/istio-ingress             1/1     1            1           2d
+istio-system    deployment.apps/istio-ingress             1/1     1            1           46h
+istio-system    deployment.apps/istiod                    1/1     1            1           2d3h
+kube-system     deployment.apps/coredns                   1/1     1            1           2d3h
+servicex        deployment.apps/servicex                  1/1     1            1           2d1h
+servicey        deployment.apps/servicey                  1/1     1            1           2d1h
+
+NAMESPACE       NAME                                                DESIRED   CURRENT   READY   AGE
+authority       replicaset.apps/authority-557d4b4d87                1         1         1       2d1h
+flux-system     replicaset.apps/helm-controller-8555c97646          1         1         1       2d3h
+flux-system     replicaset.apps/kustomize-controller-d676b44b6      1         1         1       2d3h
+flux-system     replicaset.apps/notification-controller-d4748b487   1         1         1       2d3h
+flux-system     replicaset.apps/source-controller-7454d84978        1         1         1       2d3h
+istio-ingress   replicaset.apps/istio-ingress-7f5f6f58b8            1         1         1       2d
+istio-system    replicaset.apps/istio-ingress-68c74f4659            0         0         0       45h
+istio-system    replicaset.apps/istio-ingress-694bfbc597            0         0         0       23h
+istio-system    replicaset.apps/istio-ingress-69b69cf756            0         0         0       45h
+istio-system    replicaset.apps/istio-ingress-76846cd948            0         0         0       46h
+istio-system    replicaset.apps/istio-ingress-77d568d77b            0         0         0       23h
+istio-system    replicaset.apps/istio-ingress-784b969d75            0         0         0       23h
+istio-system    replicaset.apps/istio-ingress-7dfb5db76f            1         1         1       33m
+istio-system    replicaset.apps/istio-ingress-85bb545b6c            0         0         0       23h
+istio-system    replicaset.apps/istio-ingress-86c94dcf78            0         0         0       45m
+istio-system    replicaset.apps/istio-ingress-cd56cdb64             0         0         0       33m
+istio-system    replicaset.apps/istiod-c58746c74                    1         1         1       2d3h
+kube-system     replicaset.apps/coredns-7db6d8ff4d                  1         1         1       2d3h
+servicex        replicaset.apps/servicex-78784f85c                  1         1         1       2d1h
+servicey        replicaset.apps/servicey-858997546f                 1         1         1       2d1h
+
+NAMESPACE       NAME                                                REFERENCE                  TARGETS              MINPODS   MAXPODS   REPLICAS   AGE
+istio-ingress   horizontalpodautoscaler.autoscaling/istio-ingress   Deployment/istio-ingress   cpu: <unknown>/80%   1         5         1          2d2h
+istio-system    horizontalpodautoscaler.autoscaling/istiod          Deployment/istiod          cpu: <unknown>/80%   1         5         1          2d3h
+
+dell@dell-Latitude-3420:~$ kubectl get  po -A
+NAMESPACE       NAME                                      READY   STATUS    RESTARTS      AGE
+authority       authority-557d4b4d87-gvfrx                1/1     Running   3 (63m ago)   2d1h
+flux-system     helm-controller-8555c97646-2lr58          1/1     Running   5 (62m ago)   2d3h
+flux-system     kustomize-controller-d676b44b6-82vgw      1/1     Running   7 (62m ago)   2d3h
+flux-system     notification-controller-d4748b487-l5q6n   1/1     Running   5 (62m ago)   2d3h
+flux-system     source-controller-7454d84978-jd4f6        1/1     Running   5 (63m ago)   2d3h
+istio-ingress   istio-ingress-7f5f6f58b8-xrxdc            1/1     Running   3 (63m ago)   2d
+istio-system    istio-ingress-7dfb5db76f-tz7rg            1/1     Running   0             33m
+istio-system    istiod-c58746c74-q8wtr                    1/1     Running   3 (63m ago)   2d3h
+kube-system     coredns-7db6d8ff4d-mfxn8                  1/1     Running   3 (63m ago)   2d3h
+kube-system     etcd-minikube                             1/1     Running   3 (63m ago)   2d3h
+kube-system     kube-apiserver-minikube                   1/1     Running   3 (63m ago)   2d3h
+kube-system     kube-controller-manager-minikube          1/1     Running   3 (63m ago)   2d3h
+kube-system     kube-proxy-xdfjm                          1/1     Running   3 (63m ago)   2d3h
+kube-system     kube-scheduler-minikube                   1/1     Running   3 (63m ago)   2d3h
+kube-system     storage-provisioner                       1/1     Running   8 (62m ago)   2d3h
+servicex        servicex-78784f85c-cq757                  1/1     Running   3 (63m ago)   2d1h
+servicey        servicey-858997546f-bjws5                 1/1     Running   3 (63m ago)   2d1h
+dell@dell-Latitude-3420:~$ kubectl get  svc -A
+NAMESPACE       NAME                      TYPE        CLUSTER-IP       EXTERNAL-IP   PORT(S)                                        AGE
+authority       authority                 ClusterIP   10.107.90.32     <none>        80/TCP                                         2d1h
+default         kubernetes                ClusterIP   10.96.0.1        <none>        443/TCP                                        2d3h
+flux-system     notification-controller   ClusterIP   10.110.29.37     <none>        80/TCP                                         2d3h
+flux-system     source-controller         ClusterIP   10.96.6.189      <none>        80/TCP                                         2d3h
+flux-system     webhook-receiver          ClusterIP   10.99.94.177     <none>        80/TCP                                         2d3h
+istio-ingress   istio-ingress             ClusterIP   10.110.111.235   <none>        15021/TCP,80/TCP,443/TCP,15012/TCP,15017/TCP   46h
+istio-system    istio-ingress             ClusterIP   10.98.51.203     <none>        15021/TCP,80/TCP,443/TCP,15012/TCP,15017/TCP   46h
+istio-system    istiod                    ClusterIP   10.101.17.149    <none>        15010/TCP,15012/TCP,443/TCP,15014/TCP          2d3h
+kube-system     kube-dns                  ClusterIP   10.96.0.10       <none>        53/UDP,53/TCP,9153/TCP                         2d3h
+servicex        servicex                  ClusterIP   10.111.215.193   <none>        80/TCP                                         2d1h
+
+# Then I retested curl command. It actually works locally (when ı do run port forwarding on one terminal and run the curl on another terminal) as seen below. However it doesnt work outside meaning that without doing port forwarding to my local.
+
+On first terminal ;
+
+dell@dell-Latitude-3420:~$ kubectl port-forward svc/servicex 8080:80 -n servicex
+Forwarding from 127.0.0.1:8080 -> 8080
+Forwarding from [::1]:8080 -> 8080
+Handling connection for 8080
+E0804 14:48:42.545220   38474 portforward.go:398] error copying from local connection to remote stream: writeto tcp4 127.0.0.1:8080->127.0.0.1:51864: read tcp4 127.0.0.1:8080->127.0.0.1:51864: read: connection reset by peer
+
+On second terminal ;
+
+dell@dell-Latitude-3420:~$ token=$(curl -s https://authority.cb-interview.com/token --resolve authority.cb-interview.com:443:127.0.0.1)
+curl -v https://localhost:8080/x --header "Authorization: Bearer $token"
+*   Trying 127.0.0.1:8080...
+* Connected to localhost (127.0.0.1) port 8080 (#0)
+* ALPN, offering h2
+* ALPN, offering http/1.1
+*  CAfile: /etc/ssl/certs/ca-certificates.crt
+*  CApath: /etc/ssl/certs
+* TLSv1.0 (OUT), TLS header, Certificate Status (22):
+* TLSv1.3 (OUT), TLS handshake, Client hello (1):
+* (5454) (IN), , Unknown (72):
+* error:0A00010B:SSL routines::wrong version number
+* Closing connection 0
+curl: (35) error:0A00010B:SSL routines::wrong version number
+
+# But curl is not working without doing port forwarding ;
+
+dell@dell-Latitude-3420:~$ curl -v https://authority.cb-interview.com/token --resolve authority.cb-interview.com:443:127.0.0.1
+* Added authority.cb-interview.com:443:127.0.0.1 to DNS cache
+* Hostname authority.cb-interview.com was found in DNS cache
+*   Trying 127.0.0.1:443...
+* connect to 127.0.0.1 port 443 failed: Connection refused
+* Failed to connect to authority.cb-interview.com port 443 after 0 ms: Connection refused
+* Closing connection 0
+curl: (7) Failed to connect to authority.cb-interview.com port 443 after 0 ms: Connection refused
+
+
 
 
 
