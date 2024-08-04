@@ -725,6 +725,56 @@ dell@dell-Latitude-3420:~$ curl -v https://authority.cb-interview.com/token --re
 * Closing connection 0
 curl: (7) Failed to connect to authority.cb-interview.com port 443 after 0 ms: Connection refused
 
+# As latest, I solved some issues like retrieving Token. I could successfully see the token in echo command as below. ;
+
+dell@dell-Latitude-3420:/etc$ token=$(curl -s -H "Host: authority.cb-interview.com" http://localhost:8080/token)
+echo $token
+eyJhbGciOiJSUzI1NiIsImtpZCI6IkRIRmJwb0lVcXJZOHQyenBBMnFYZkNtcjVWTzVaRXI0UnpIVV8tZW52dlEiLCJ0eXAiOiJKV1QifQ.eyJleHAiOjQ2ODU5ODk3MDAsImZvbyI6ImJhciIsImlhdCI6MTUzMjM4OTcwMCwiaXNzIjoidGVzdGluZ0BzZWN1cmUuaXN0aW8uaW8iLCJzdWIiOiJ0ZXN0aW5nQHNlY3VyZS5pc3Rpby5pbyJ9.CfNnxWP2tcnR9q0vxyxweaF3ovQYHYZl82hAUsn21bwQd9zP7c-LS9qd_vpdLG4Tn1A15NxfCjp5f7QNBUo-KC9PJqYpgGbaXhaGx7bEdFWjcwv3nZzvc7M__ZpaCERdwU7igUmJqYGBYQ51vr2njU9ZimyKkfDe3axcyiBZde7G6dabliUosJvvKOPcKIWPccCgefSj_GNfwIip3-SsFdlR7BtbVUcqR-yv-XOxJ3Uc1MI0tz3uMiiZcyPV7sNCU4KRnemRIMHVOfuvHsU60_GhGbiSFzgPTAa9WTltbnarTbxudb_YEOx12JiwYToeX0DCPb43W1tzIBxgm8NxUg
+
+I could then run minikube tunnel on one terminal ;
+
+^Cdell@dell-Latitude-3420:~minikube tunnel
+Status:	
+	machine: minikube
+	pid: 182202
+	route: 10.96.0.0/12 -> 192.168.49.2
+	minikube: Running
+	services: [istio-ingress]
+    errors: 
+		minikube: no errors
+		router: no errors
+		loadbalancer emulator: no errors
+
+
+# Then I used this token in curl to connect but curl still didnt work ;
+
+dell@dell-Latitude-3420:/etc$ curl -v -H "Host: servicex.cb-interview.com" http://localhost:32736/x --header "Authorization: Bearer $token"
+*   Trying 127.0.0.1:32736...
+* connect to 127.0.0.1 port 32736 failed: Connection refused
+*   Trying ::1:32736...
+* connect to ::1 port 32736 failed: Connection refused
+* Failed to connect to localhost port 32736 after 0 ms: Connection refused
+* Closing connection 0
+curl: (7) Failed to connect to localhost port 32736 after 0 ms: Connection refused
+dell@dell-Latitude-3420:/etc$ curl -v -H "Host: servicex.cb-interview.com" http://localhost:8080/x --header "Authorization: Bearer $token"
+*   Trying 127.0.0.1:8080...
+* connect to 127.0.0.1 port 8080 failed: Connection refused
+*   Trying ::1:8080...
+* connect to ::1 port 8080 failed: Connection refused
+* Failed to connect to localhost port 8080 after 0 ms: Connection refused
+* Closing connection 0
+curl: (7) Failed to connect to localhost port 8080 after 0 ms: Connection refused
+dell@dell-Latitude-3420:/etc$ curl -v -H "Host: servicex.cb-interview.com" http://localhost:80/x --header "Authorization: Bearer $token"
+*   Trying 127.0.0.1:80...
+* connect to 127.0.0.1 port 80 failed: Connection refused
+*   Trying ::1:80...
+* connect to ::1 port 80 failed: Connection refused
+* Failed to connect to localhost port 80 after 0 ms: Connection refused
+* Closing connection 0
+curl: (7) Failed to connect to localhost port 80 after 0 ms: Connection refused
+dell@dell-Latitude-3420:/etc$ 
+
+
 
 
 
