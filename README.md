@@ -714,26 +714,20 @@ curl -v https://localhost:8080/x --header "Authorization: Bearer $token"
 * Closing connection 0
 curl: (35) error:0A00010B:SSL routines::wrong version number
 
-# But curl is not working without doing port forwarding ;
 
-dell@dell-Latitude-3420:~$ curl -v https://authority.cb-interview.com/token --resolve authority.cb-interview.com:443:127.0.0.1
-* Added authority.cb-interview.com:443:127.0.0.1 to DNS cache
-* Hostname authority.cb-interview.com was found in DNS cache
-*   Trying 127.0.0.1:443...
-* connect to 127.0.0.1 port 443 failed: Connection refused
-* Failed to connect to authority.cb-interview.com port 443 after 0 ms: Connection refused
-* Closing connection 0
-curl: (7) Failed to connect to authority.cb-interview.com port 443 after 0 ms: Connection refused
-
-# As latest, I solved some issues like retrieving Token. I could successfully see the token in echo command as below. ;
-
-dell@dell-Latitude-3420:/etc$ token=$(curl -s -H "Host: authority.cb-interview.com" http://localhost:8080/token)
-echo $token
-eyJhbGciOiJSUzI1NiIsImtpZCI6IkRIRmJwb0lVcXJZOHQyenBBMnFYZkNtcjVWTzVaRXI0UnpIVV8tZW52dlEiLCJ0eXAiOiJKV1QifQ.eyJleHAiOjQ2ODU5ODk3MDAsImZvbyI6ImJhciIsImlhdCI6MTUzMjM4OTcwMCwiaXNzIjoidGVzdGluZ0BzZWN1cmUuaXN0aW8uaW8iLCJzdWIiOiJ0ZXN0aW5nQHNlY3VyZS5pc3Rpby5pbyJ9.CfNnxWP2tcnR9q0vxyxweaF3ovQYHYZl82hAUsn21bwQd9zP7c-LS9qd_vpdLG4Tn1A15NxfCjp5f7QNBUo-KC9PJqYpgGbaXhaGx7bEdFWjcwv3nZzvc7M__ZpaCERdwU7igUmJqYGBYQ51vr2njU9ZimyKkfDe3axcyiBZde7G6dabliUosJvvKOPcKIWPccCgefSj_GNfwIip3-SsFdlR7BtbVUcqR-yv-XOxJ3Uc1MI0tz3uMiiZcyPV7sNCU4KRnemRIMHVOfuvHsU60_GhGbiSFzgPTAa9WTltbnarTbxudb_YEOx12JiwYToeX0DCPb43W1tzIBxgm8NxUg
 
 dell@dell-Latitude-3420:/etc$ cat /etc/hosts
-127.0.0.1	localhost
-127.0.1.1	dell-Latitude-3420
+127.0.0.1       localhost
+127.0.1.1       dell-Latitude-3420
+::1     ip6-localhost ip6-loopback
+fe00::0 ip6-localnet
+ff00::0 ip6-mcastprefix
+ff02::1 ip6-allnodes
+ff02::2 ip6-allrouters
+#10.98.51.203 authority.cb-interview.com
+#10.98.51.203 servicex.cb-interview.com
+127.0.0.1:8080 authority.cb-interview.com
+127.0.0.1:8080 servicex.cb-interview.com
 
 # The following lines are desirable for IPv6 capable hosts
 ::1     ip6-localhost ip6-loopback
@@ -763,37 +757,42 @@ Status:
 		loadbalancer emulator: no errors
 
 
-# Then I used this token in curl to connect but curl still didnt work ;
 
-dell@dell-Latitude-3420:/etc$ curl -v -H "Host: servicex.cb-interview.com" http://localhost:32736/x --header "Authorization: Bearer $token"
-*   Trying 127.0.0.1:32736...
-* connect to 127.0.0.1 port 32736 failed: Connection refused
-*   Trying ::1:32736...
-* connect to ::1 port 32736 failed: Connection refused
-* Failed to connect to localhost port 32736 after 0 ms: Connection refused
-* Closing connection 0
-curl: (7) Failed to connect to localhost port 32736 after 0 ms: Connection refused
-dell@dell-Latitude-3420:/etc$ curl -v -H "Host: servicex.cb-interview.com" http://localhost:8080/x --header "Authorization: Bearer $token"
+
+
+-----
+
+
+retrieve token ;
+
+dell@dell-Latitude-3420:/etc$ token=$(curl -s -H "Host: authority.cb-interview.com" http://localhost:8080/token
+)
+dell@dell-Latitude-3420:/etc$ echo $token
+eyJhbGciOiJSUzI1NiIsImtpZCI6IkRIRmJwb0lVcXJZOHQyenBBMnFYZkNtcjVWTzVaRXI0UnpIVV8tZW52dlEiLCJ0eXAiOiJKV1QifQ.eyJleHAiOjQ2ODU5ODk3MDAsImZvbyI6ImJhciIsImlhdCI6MTUzMjM4OTcwMCwiaXNzIjoidGVzdGluZ0BzZWN1cmUuaXN0aW8uaW8iLCJzdWIiOiJ0ZXN0aW5nQHNlY3VyZS5pc3Rpby5pbyJ9.CfNnxWP2tcnR9q0vxyxweaF3ovQYHYZl82hAUsn21bwQd9zP7c-LS9qd_vpdLG4Tn1A15NxfCjp5f7QNBUo-KC9PJqYpgGbaXhaGx7bEdFWjcwv3nZzvc7M__ZpaCERdwU7igUmJqYGBYQ51vr2njU9ZimyKkfDe3axcyiBZde7G6dabliUosJvvKOPcKIWPccCgefSj_GNfwIip3-SsFdlR7BtbVUcqR-yv-XOxJ3Uc1MI0tz3uMiiZcyPV7sNCU4KRnemRIMHVOfuvHsU60_GhGbiSFzgPTAa9WTltbnarTbxudb_YEOx12JiwYToeX0DCPb43W1tzIBxgm8NxUg
+
+dell@dell-Latitude-3420:/etc$ curl -s -H "Host: servicex.cb-interview.com" http://localhost:8080/x --header "Authorization: Bearer $token" --verbose
 *   Trying 127.0.0.1:8080...
-* connect to 127.0.0.1 port 8080 failed: Connection refused
-*   Trying ::1:8080...
-* connect to ::1 port 8080 failed: Connection refused
-* Failed to connect to localhost port 8080 after 0 ms: Connection refused
-* Closing connection 0
-curl: (7) Failed to connect to localhost port 8080 after 0 ms: Connection refused
-dell@dell-Latitude-3420:/etc$ curl -v -H "Host: servicex.cb-interview.com" http://localhost:80/x --header "Authorization: Bearer $token"
-*   Trying 127.0.0.1:80...
-* connect to 127.0.0.1 port 80 failed: Connection refused
-*   Trying ::1:80...
-* connect to ::1 port 80 failed: Connection refused
-* Failed to connect to localhost port 80 after 0 ms: Connection refused
-* Closing connection 0
-curl: (7) Failed to connect to localhost port 80 after 0 ms: Connection refused
-dell@dell-Latitude-3420:/etc$ 
+* Connected to localhost (127.0.0.1) port 8080 (#0)
+> GET /x HTTP/1.1
+> Host: servicex.cb-interview.com
+> User-Agent: curl/7.81.0
+> Accept: */*
+> Authorization: Bearer eyJhbGciOiJSUzI1NiIsImtpZCI6IkRIRmJwb0lVcXJZOHQyenBBMnFYZkNtcjVWTzVaRXI0UnpIVV8tZW52dlEiLCJ0eXAiOiJKV1QifQ.eyJleHAiOjQ2ODU5ODk3MDAsImZvbyI6ImJhciIsImlhdCI6MTUzMjM4OTcwMCwiaXNzIjoidGVzdGluZ0BzZWN1cmUuaXN0aW8uaW8iLCJzdWIiOiJ0ZXN0aW5nQHNlY3VyZS5pc3Rpby5pbyJ9.CfNnxWP2tcnR9q0vxyxweaF3ovQYHYZl82hAUsn21bwQd9zP7c-LS9qd_vpdLG4Tn1A15NxfCjp5f7QNBUo-KC9PJqYpgGbaXhaGx7bEdFWjcwv3nZzvc7M__ZpaCERdwU7igUmJqYGBYQ51vr2njU9ZimyKkfDe3axcyiBZde7G6dabliUosJvvKOPcKIWPccCgefSj_GNfwIip3-SsFdlR7BtbVUcqR-yv-XOxJ3Uc1MI0tz3uMiiZcyPV7sNCU4KRnemRIMHVOfuvHsU60_GhGbiSFzgPTAa9WTltbnarTbxudb_YEOx12JiwYToeX0DCPb43W1tzIBxgm8NxUg
+> 
+* Mark bundle as not supporting multiuse
+< HTTP/1.1 400 Bad Request
+< Content-Length: 334
+< Content-Type: text/html
+< Date: Mon, 05 Aug 2024 11:15:32 GMT
+< Server: Kestrel
+< 
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN""http://www.w3.org/TR/html4/strict.dtd">
+<HTML><HEAD><TITLE>Bad Request</TITLE>
+<META HTTP-EQUIV="Content-Type" Content="text/html; charset=us-ascii"></ HEAD >
+<BODY><h2>Bad Request - Invalid Hostname</h2>
+<hr><p>HTTP Error 400. The request hostname is invalid.</p>
+* Connection #0 to host localhost left intact
 
-
-# I actually checked all notes in "**General Requirements for All Applications:**" in your TaskSteps.md file but none of them solved curl issue. I can provide you any extra kubectl output or file output if needed anytime although curl issue persist.
-
-
-
+# I actually checked all notes in "**General Requirements for All Applications:**" in your TaskSteps.md file but none of them solved curl issue.
+# I am retrieving token from authority application, everything is working fine. Then I m putting same token to servicex application to get the success result but unfortunately on the application level, it is not accepting the host which can possible to fix on application level using allow origin access.
 
