@@ -731,7 +731,24 @@ dell@dell-Latitude-3420:/etc$ token=$(curl -s -H "Host: authority.cb-interview.c
 echo $token
 eyJhbGciOiJSUzI1NiIsImtpZCI6IkRIRmJwb0lVcXJZOHQyenBBMnFYZkNtcjVWTzVaRXI0UnpIVV8tZW52dlEiLCJ0eXAiOiJKV1QifQ.eyJleHAiOjQ2ODU5ODk3MDAsImZvbyI6ImJhciIsImlhdCI6MTUzMjM4OTcwMCwiaXNzIjoidGVzdGluZ0BzZWN1cmUuaXN0aW8uaW8iLCJzdWIiOiJ0ZXN0aW5nQHNlY3VyZS5pc3Rpby5pbyJ9.CfNnxWP2tcnR9q0vxyxweaF3ovQYHYZl82hAUsn21bwQd9zP7c-LS9qd_vpdLG4Tn1A15NxfCjp5f7QNBUo-KC9PJqYpgGbaXhaGx7bEdFWjcwv3nZzvc7M__ZpaCERdwU7igUmJqYGBYQ51vr2njU9ZimyKkfDe3axcyiBZde7G6dabliUosJvvKOPcKIWPccCgefSj_GNfwIip3-SsFdlR7BtbVUcqR-yv-XOxJ3Uc1MI0tz3uMiiZcyPV7sNCU4KRnemRIMHVOfuvHsU60_GhGbiSFzgPTAa9WTltbnarTbxudb_YEOx12JiwYToeX0DCPb43W1tzIBxgm8NxUg
 
-I could then run minikube tunnel on one terminal ;
+dell@dell-Latitude-3420:/etc$ cat /etc/hosts
+127.0.0.1	localhost
+127.0.1.1	dell-Latitude-3420
+
+# The following lines are desirable for IPv6 capable hosts
+::1     ip6-localhost ip6-loopback
+fe00::0 ip6-localnet
+ff00::0 ip6-mcastprefix
+ff02::1 ip6-allnodes
+ff02::2 ip6-allrouters
+10.98.51.203 authority.cb-interview.com
+10.98.51.203 servicex.cb-interview.com
+
+dell@dell-Latitude-3420:~$ kubectl get svc istio-ingress -n istio-system
+NAME            TYPE           CLUSTER-IP     EXTERNAL-IP    PORT(S)                                                                      AGE
+istio-ingress   LoadBalancer   10.98.51.203   10.98.51.203   15021:30579/TCP,80:32736/TCP,443:32017/TCP,15012:31987/TCP,15017:31861/TCP   2d16h
+
+# I could then run minikube tunnel on one terminal ;
 
 ^Cdell@dell-Latitude-3420:~minikube tunnel
 Status:	
